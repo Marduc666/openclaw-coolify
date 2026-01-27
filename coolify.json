@@ -1,0 +1,23 @@
+{
+    "name": "Clawdbot – Personal AI Assistant",
+    "description": "Run your own private, always-on AI assistant with WhatsApp, Telegram, Discord, Slack, and WebChat. One-click deploy on Coolify. No CLI required.",
+    "version": "1.0.0",
+    "services": [
+        {
+            "name": "clawdbot",
+            "type": "docker-compose",
+            "dockerComposeFile": "docker-compose.yaml"
+        }
+    ],
+    "tags": [
+        "ai",
+        "chatbot",
+        "whatsapp",
+        "telegram",
+        "discord",
+        "personal-ai",
+        "self-hosted"
+    ],
+    "documentation": "https://docs.molt.bot/",
+    "website": "https://clawd.bot"
+}
