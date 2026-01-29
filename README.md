@@ -16,27 +16,27 @@ This is a production-grade setup for running **Moltbot**—your personal agentic
 
 Before deploying, configure your **Environment Variables** in Coolify. These keys unlock different AI models and features.
 
-### Required
+### 🧠 AI Models (Required: At least one)
+You must provide **at least one** of the following keys to power the agent.
+
 | Variable | Description |
 | :--- | :--- |
 | `OPENAI_API_KEY` | Required for many core reasoning tasks (OpenAI models). |
 | `ANTHROPIC_API_KEY` | Unlocks Claude 3.5 Sonnet / Opus (highly recommended for coding). |
-
-### Optional (Recommended)
-| Variable | Description |
-| :--- | :--- |
 | `MINIMAX_API_KEY` | Unlocks MiniMax M2.1 models (great performance/price). |
 | `GEMINI_API_KEY` | Google Gemini models. |
 | `KIMI_API_KEY` | Kimi / Moonshot AI models. |
-| `TELEGRAM_BOT_TOKEN` | If using Telegram (see Channel Setup below). |
 
-### Advanced
+### 🔌 Integrations (Optional)
+Enable public URLs, deployments, or chat channels.
+
 | Variable | Description |
 | :--- | :--- |
+| `TELEGRAM_BOT_TOKEN` | If using Telegram (see Channel Setup below). |
+| `CF_TUNNEL_TOKEN` | Cloudflare Tunnel token for exposing agent-created apps (Public URLs). |
+| `VERCEL_TOKEN` | For deploying apps to Vercel (`vercel deploy --token ...`). |
+| `GITHUB_TOKEN` | For creating repos/PRs (`gh auth login --with-token`). |
 | `MOLTBOT_GATEWAY_PORT` | Internal port (Default: `18789`). Only change if needed. |
-| `CF_TUNNEL_TOKEN` | Optional. Cloudflare Tunnel token for exposing agent-created apps. |
-| `VERCEL_TOKEN` | Optional. For deploying apps to Vercel (`vercel deploy --token ...`). |
-| `GITHUB_TOKEN` | Optional. For creating repos and pushing code (`gh auth login --with-token`). |
 
 > **Pro Tip**: You can simply copy the contents of [.env.example](.env.example) into Coolify's bulk edit view.
 
