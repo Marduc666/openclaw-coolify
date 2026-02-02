@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-SEARXNG_URL="${SEARXNG_API_URL:-http://searxng:8080}"
+SEARXNG_URL="${SEARXNG_API_URL:-http://searxng:8181}"
 
 QUERY="$1"
 
