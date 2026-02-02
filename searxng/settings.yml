@@ -1,7 +1,7 @@
 use_default_settings: true
 
 server:
-  port: 8080
+  port: 8181
   bind_address: 0.0.0.0
   secret_key: ${SEARXNG_SERVER_SECRET_KEY}
   image_proxy: true
