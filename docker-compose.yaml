@@ -12,6 +12,9 @@ services:
       args:
         - OPENCLAW_BETA=${OPENCLAW_BETA:-false}
     restart: on-failure:10
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.openclaw-18789.loadbalancer.server.port=18789"    
     ulimits:
       nofile:
         soft: 65535
@@ -34,7 +37,7 @@ services:
 
       
       # Map OpenClaw vars
-      OPENCLAW_GATEWAY_BIND: local
+      OPENCLAW_GATEWAY_BIND: lan
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       # Tell the binary where to look for state/config
       OPENCLAW_STATE_DIR: /root/.openclaw
