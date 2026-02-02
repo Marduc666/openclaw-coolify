@@ -191,7 +191,6 @@ echo ""
 echo "🌍 Service URL (Local): http://localhost:${OPENCLAW_GATEWAY_PORT:-18789}?token=$TOKEN"
 if [ -n "$SERVICE_FQDN_OPENCLAW" ]; then
     echo "☁️  Service URL (Public): https://${SERVICE_FQDN_OPENCLAW}?token=$TOKEN"
-    echo "    (Wait for cloud tunnel to propagate if just started)"
 fi
 echo ""
 echo "👉 Onboarding:"
