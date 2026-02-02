@@ -162,7 +162,7 @@ services:
       - searxng-data:/var/lib/searxng
 
     environment:
-      SEARXNG_BASE_URL: http://searxng:8080
+      SEARXNG_BASE_URL: http://searxng:8181
       SEARXNG_SERVER_SECRET_KEY: ${SERVICE_BASE64_SEARXNG}
 
     cap_drop:
