@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsof \
     openssl \
     ca-certificates \
-    ca-certificates \
     gnupg \
     ripgrep fd-find fzf bat \
     pandoc \
