@@ -19,6 +19,11 @@ services:
       - "traefik.http.routers.openclaw.rule=Host(`{{.Service.Fqdn}}`)"
       - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
       - "traefik.http.routers.openclaw.tls.certresolver=letsencrypt"
+    build:
+      context: .
+      args:
+        - OPENCLAW_BETA=${OPENCLAW_BETA:-false}
+    restart: on-failure:10
     ulimits:
       nofile:
         soft: 65535
