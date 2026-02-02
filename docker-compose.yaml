@@ -14,7 +14,7 @@ services:
     restart: on-failure:10
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.openclaw-18789.loadbalancer.server.port=18789"    
+      - "traefik.http.services.openclaw.loadbalancer.server.port=18789"    
     ulimits:
       nofile:
         soft: 65535
