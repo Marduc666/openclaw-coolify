@@ -34,7 +34,7 @@ services:
 
       
       # Map OpenClaw vars
-      OPENCLAW_GATEWAY_BIND: lan
+      OPENCLAW_GATEWAY_BIND: local
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       # Tell the binary where to look for state/config
       OPENCLAW_STATE_DIR: /root/.openclaw
