@@ -139,6 +139,14 @@ if [ ! -f "$CONFIG_FILE" ]; then
 EOF
 fi
 
+if [ -f "$CONFIG_FILE" ]; then
+  if ! grep -q '"mode":\s*"local"' "$CONFIG_FILE"; then
+    echo "🔧 Setting gateway.mode=local..."
+    openclaw config set gateway.mode local 2>/dev/null || true
+  fi
+fi
+
+
 # ----------------------------
 # Export state
 # ----------------------------
