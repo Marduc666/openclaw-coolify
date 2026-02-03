@@ -13,10 +13,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s  
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.openclaw.entryPoints=https"
-      - "traefik.http.services.openclaw.loadbalancer.server.port=18789"
     build:
       context: .
       args:
