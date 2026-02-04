@@ -23,8 +23,10 @@ SANDBOX_IDS=$(jq -r '.sandboxes | keys[]' "$STATE_FILE")
 for id in $SANDBOX_IDS; do
   log "🔍 Checking sandbox: $id"
   
-  # Extract details
+  # Extract details (these are used for logging/debugging purposes)
+  # shellcheck disable=SC2034
   PROJECT=$(jq -r ".sandboxes[\"$id\"].project" "$STATE_FILE")
+  # shellcheck disable=SC2034
   STATUS=$(jq -r ".sandboxes[\"$id\"].status" "$STATE_FILE")
   
   # Check if docker container exists
@@ -40,8 +42,7 @@ for id in $SANDBOX_IDS; do
   
   if [ "$IS_RUNNING" != "true" ]; then
     log "⚠️  Container $id is stopped. Attempting restart..."
-    docker start "$id"
-    if [ $? -eq 0 ]; then
+    if docker start "$id"; then
       log "✅ Restarted container $id"
     else
       log "❌ Failed to restart $id"
