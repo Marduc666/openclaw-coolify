@@ -298,10 +298,10 @@ docker compose build --build-arg OPENCLAW_BETA=true --no-cache
 
 ## Resources
 
-- **Official Docs:** [docs.openclaw.ai](https://docs.openclaw.ai/) (if available)
-- **Docker Docs:** [docs.docker.com](https://docs.docker.com/)
-- **Docker Compose Docs:** [docs.docker.com/compose/](https://docs.docker.com/compose/)
-- **Troubleshooting:** Check the `docs/` directory in this repository
+- **GitHub Repository:** [Marduc666/openclaw-coolify](https://github.com/Marduc666/openclaw-coolify)
+- **Docker Documentation:** [docs.docker.com](https://docs.docker.com/)
+- **Docker Compose Documentation:** [docs.docker.com/compose/](https://docs.docker.com/compose/)
+- **Troubleshooting:** Check the GitHub Issues page for common problems and solutions
 
 ## Getting Help
 

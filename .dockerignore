@@ -8,6 +8,9 @@
 .env.local
 .env.*.local
 
+# Keep .env.example for reference in container
+!.env.example
+
 # macOS
 .DS_Store
 .AppleDouble
@@ -55,7 +58,12 @@ __tests__
 # Documentation (we keep BOOTSTRAP.md and SOUL.md, exclude others)
 docs/
 *.draft.md
-BUILD.md
+
+# Keep these important docs in the image
+!BOOTSTRAP.md
+!SOUL.md
+!README.md
+!QUICKSTART.md
 
 # Temporary files
 tmp
@@ -78,3 +86,6 @@ docker-compose.override.yml
 # Keep these (override previous excludes if needed)
 !BOOTSTRAP.md
 !SOUL.md
+!README.md
+!QUICKSTART.md
+!.env.example
