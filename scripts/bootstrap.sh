@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-OPENCLAW_STATE="/root/.openclaw"
+OPENCLAW_STATE="/data/.openclaw"
 CONFIG_FILE="$OPENCLAW_STATE/openclaw.json"
-WORKSPACE_DIR="/root/openclaw-workspace"
+WORKSPACE_DIR="/data/openclaw-workspace"
 
 
 
@@ -20,10 +20,10 @@ chmod 700 "$OPENCLAW_STATE/credentials"
 seed_agent() {
   local id="$1"
   local name="$2"
-  local dir="/root/openclaw-$id"
+  local dir="/data/openclaw-$id"
 
   if [ "$id" = "main" ]; then
-    dir="/root/openclaw-workspace"
+    dir="/fata/openclaw-workspace"
   fi
 
   mkdir -p "$dir"
@@ -132,7 +132,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
       }
     },
     "list": [
-      { "id": "main","default": true, "name": "default",  "workspace": "/root/openclaw-workspace"}
+      { "id": "main","default": true, "name": "default",  "workspace": "/data/openclaw-workspace"}
     ]
   }
 }
