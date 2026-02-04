@@ -1,37 +1,61 @@
 FROM node:lts-bookworm-slim
 
+# Build arguments
+ARG OPENCLAW_BETA=false
+ARG GO_VERSION=1.23.4
+ARG OPENCLAW_GATEWAY_PORT=18789
+
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_ROOT_USER_ACTION=ignore
+    PIP_ROOT_USER_ACTION=ignore \
+    OPENCLAW_BETA=${OPENCLAW_BETA} \
+    OPENCLAW_NO_ONBOARD=1 \
+    NPM_CONFIG_UNSAFE_PERM=true \
+    OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT}
 
-# Install Core & Power Tools + Docker CLI (client only)
+# =============================================================================
+# SYSTEM DEPENDENCIES
+# =============================================================================
+# Combine all apt operations into a single layer and clean up aggressively
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Core utilities
     curl \
     wget \
     git \
     apt-utils \
     build-essential \
     software-properties-common \
+    ca-certificates \
+    gnupg \
+    openssl \
+    unzip \
+    # Python stack
     python3 \
     python3-pip \
     python3-venv \
+    # CLI tools
     jq \
     lsof \
-    openssl \
-    ca-certificates \
-    gnupg \
-    ripgrep fd-find fzf bat \
+    ripgrep \
+    fd-find \
+    fzf \
+    bat \
+    # Document processing
     pandoc \
     poppler-utils \
     ffmpeg \
     imagemagick \
     graphviz \
+    # Databases & security
     sqlite3 \
     pass \
+    # Browser
     chromium \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install Docker CE CLI (Latest) to support API 1.44+
+# =============================================================================
+# DOCKER CLI
+# =============================================================================
 RUN install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
     chmod a+r /etc/apt/keyrings/docker.asc && \
@@ -40,94 +64,155 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update && \
-    apt-get install -y docker-ce-cli && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
-# Install Go (Latest)
-RUN curl -L "https://go.dev/dl/go1.23.4.linux-amd64.tar.gz" -o go.tar.gz && \
+# =============================================================================
+# GO INSTALLATION
+# =============================================================================
+RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o go.tar.gz && \
+    echo "Downloading Go ${GO_VERSION}..." && \
     tar -C /usr/local -xzf go.tar.gz && \
     rm go.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
 
-# Install GitHub CLI (gh)
+# =============================================================================
+# GITHUB CLI
+# =============================================================================
 RUN mkdir -p -m 755 /etc/apt/keyrings && \
-    wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
+    wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+    tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
     chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
+    tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
     apt-get update && \
-    apt-get install -y gh && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends gh && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install uv (Python tool manager)
+# =============================================================================
+# UV (Python tool manager)
+# =============================================================================
 ENV UV_INSTALL_DIR="/usr/local/bin"
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN curl -fsSL https://astral.sh/uv/install.sh | sh && \
+    rm -rf /tmp/*
 
-# Install Bun
-ENV BUN_INSTALL_NODE=0
-ENV BUN_INSTALL="/root/.bun"
-RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/* && \
-    curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:/root/.bun/install/global/bin:${PATH}"
+# =============================================================================
+# BUN INSTALLATION
+# =============================================================================
+ENV BUN_INSTALL_NODE=0 \
+    BUN_INSTALL="/data/.bun"
+RUN curl -fsSL https://bun.sh/install | bash && \
+    rm -rf /tmp/*
+ENV PATH="/data/.bun/bin:/data/.bun/install/global/bin:${PATH}"
 
+# =============================================================================
+# GLOBAL NODE/BUN PACKAGES
+# =============================================================================
 # Install Vercel, Marp, QMD
-RUN bun install -g vercel @marp-team/marp-cli https://github.com/tobi/qmd && hash -r
+RUN bun install -g vercel @marp-team/marp-cli https://github.com/tobi/qmd && \
+    hash -r && \
+    bun pm -g untrusted
 
 # Configure QMD Persistence
-ENV XDG_CACHE_HOME="/root/.openclaw/cache"
+ENV XDG_CACHE_HOME="/data/.openclaw/cache"
 
-# Python tools
-RUN pip3 install ipython csvkit openpyxl python-docx pypdf botasaurus browser-use playwright --break-system-packages && \
-    playwright install-deps
+# =============================================================================
+# PYTHON TOOLS
+# =============================================================================
+RUN pip3 install --no-cache-dir --break-system-packages \
+    ipython \
+    csvkit \
+    openpyxl \
+    python-docx \
+    pypdf \
+    botasaurus \
+    browser-use \
+    playwright && \
+    playwright install-deps && \
+    rm -rf /tmp/* /datat/.cache
 
+# =============================================================================
+# COMMAND ALIASES
+# =============================================================================
+RUN ln -sf /usr/bin/fdfind /usr/bin/fd && \
+    ln -sf /usr/bin/batcat /usr/bin/bat
 
+# =============================================================================
+# OPENCLAW INSTALLATION
+# =============================================================================
+RUN if [ "$OPENCLAW_BETA" = "true" ]; then \
+        echo "Installing OpenClaw Beta..." && \
+        npm install -g openclaw@beta; \
+    else \
+        echo "Installing OpenClaw Stable..." && \
+        npm install -g openclaw; \
+    fi && \
+    # Verify installation
+    if ! command -v openclaw >/dev/null 2>&1; then \
+        echo "❌ OpenClaw install failed (binary 'openclaw' not found)"; \
+        exit 1; \
+    fi && \
+    echo "✅ openclaw binary found" && \
+    npm cache clean --force && \
+    rm -rf /tmp/* /data/.npm/_cacache
 
-# Debian aliases
-RUN ln -s /usr/bin/fdfind /usr/bin/fd || true && \
-    ln -s /usr/bin/batcat /usr/bin/bat || true
+# =============================================================================
+# AI TOOL SUITE & CLAWHUB
+# =============================================================================
+RUN bun install -g \
+    @openai/codex \
+    @google/gemini-cli \
+    opencode-ai \
+    @steipete/summarize \
+    @hyperbrowser/agent \
+    clawhub && \
+    # Claude CLI
+    curl -fsSL https://claude.ai/install.sh | bash && \
+    # Kimi CLI
+    curl -fsSL https://code.kimi.com/install.sh | bash && \
+    # Cleanup
+    rm -rf /tmp/* /data/.bun/install/cache
 
+# =============================================================================
+# FINAL PATH CONSOLIDATION
+# =============================================================================
+ENV PATH="/usr/local/go/bin:\
+/usr/local/bin:\
+/usr/bin:\
+/bin:\
+/data/.local/bin:\
+/data/.npm-global/bin:\
+/data/.bun/bin:\
+/data/.bun/install/global/bin:\
+/data/.claude/bin:\
+/data/.kimi/bin:\
+/data/go/bin"
+
+# =============================================================================
+# APPLICATION SETUP
+# =============================================================================
 WORKDIR /app
 
-# ✅ FINAL PATH (important)
-ENV PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/root/.local/bin:/root/.npm-global/bin:/root/.bun/bin:/root/.bun/install/global/bin:/root/.claude/bin:/root/.kimi/bin:/root/go/bin"
-
-# OpenClaw install
-ARG OPENCLAW_BETA=false
-ENV OPENCLAW_BETA=${OPENCLAW_BETA} \
-    OPENCLAW_NO_ONBOARD=1 \
-    NPM_CONFIG_UNSAFE_PERM=true
-
-RUN if [ "$OPENCLAW_BETA" = "true" ]; then \
-    npm install -g openclaw@beta; \
-    else \
-    npm install -g openclaw; \
-    fi && \
-    if command -v openclaw >/dev/null 2>&1; then \
-    echo "✅ openclaw binary found"; \
-    else \
-    echo "❌ OpenClaw install failed (binary 'openclaw' not found)"; \
-    exit 1; \
-    fi
-
-RUN bun pm -g untrusted
-# AI Tool Suite & ClawHub
-RUN bun install -g @openai/codex @google/gemini-cli opencode-ai @steipete/summarize @hyperbrowser/agent clawhub && \
-    curl -fsSL https://claude.ai/install.sh | bash && \
-    curl -L https://code.kimi.com/install.sh | bash
-
-
-
-
-# Copy everything (obeying .dockerignore)
+# Copy application files (respecting .dockerignore)
 COPY . .
 
-# Specialized symlinks and permissions
-RUN ln -sf /root/.claude/bin/claude /usr/local/bin/claude || true && \
-    ln -sf /root/.kimi/bin/kimi /usr/local/bin/kimi || true && \
+# Setup symlinks and permissions in a single layer
+RUN ln -sf /data/.claude/bin/claude /usr/local/bin/claude 2>/dev/null || true && \
+    ln -sf /data/.kimi/bin/kimi /usr/local/bin/kimi 2>/dev/null || true && \
     ln -sf /app/scripts/openclaw-approve.sh /usr/local/bin/openclaw-approve && \
-    ln -sf /app/scripts/openclaw-approve.sh /usr/local/bin/openclaw-approve && \
-    chmod +x /app/scripts/*.sh /usr/local/bin/openclaw-approve
+    find /app/scripts -type f -name "*.sh" -exec chmod +x {} \; && \
+    chmod +x /usr/local/bin/openclaw-approve
 
+# =============================================================================
+# HEALTHCHECK
+# =============================================================================
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:${OPENCLAW_GATEWAY_PORT}/health || exit 1
 
-EXPOSE 18789
+# =============================================================================
+# RUNTIME
+# =============================================================================
+EXPOSE ${OPENCLAW_GATEWAY_PORT}
+
+# Use exec form for better signal handling
 CMD ["bash", "/app/scripts/bootstrap.sh"]
