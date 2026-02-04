@@ -50,7 +50,7 @@ services:
       OPENCLAW_GATEWAY_BIND: lan
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       # Tell the binary where to look for state/config
-      OPENCLAW_STATE_DIR: /datat/.openclaw
+      OPENCLAW_STATE_DIR: /data/.openclaw
       OPENCLAW_WORKSPACE: /data/openclaw-workspace
 
       # API Keys injected from .env or Coolify
