@@ -6,13 +6,14 @@ services:
       - registry-data:/var/lib/registry
     environment:
       REGISTRY_HTTP_SECRET: ${SERVICE_BASE64_REGISTRY}
+  
   openclaw:
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:18789/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 20s  
+      start_period: 120s  
     build:
       context: .
       args:
@@ -32,21 +33,25 @@ services:
       PORT: 18789
       NODE_ENV: production
       NODE_OPTIONS: '--max-old-space-size=4096'
-      HOME: /root
+      HOME: /data
       TERM: xterm-256color
       # Persistence: Command History
       HISTFILE: /root/.openclaw/.bash_history
       HISTSIZE: 50000
       HISTSAVE: 50000
       HISTCONTROL: ignoreboth
-
+      XDG_CONFIG_HOME: /data/.config
+      XDG_DATA_HOME: /data/.local/share
+      XDG_CACHE_HOME: /data/.cache
+      NPM_CONFIG_CACHE: /data/.npm
+      BUN_INSTALL: /data/.bun
       
       # Map OpenClaw vars
       OPENCLAW_GATEWAY_BIND: lan
       OPENCLAW_GATEWAY_PORT: ${OPENCLAW_GATEWAY_PORT:-18789}
       # Tell the binary where to look for state/config
-      OPENCLAW_STATE_DIR: /root/.openclaw
-      OPENCLAW_WORKSPACE: /root/openclaw-workspace
+      OPENCLAW_STATE_DIR: /datat/.openclaw
+      OPENCLAW_WORKSPACE: /data/openclaw-workspace
 
       # API Keys injected from .env or Coolify
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -78,9 +83,6 @@ services:
 
       CF_TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
       # Deployment & Git
-      VERCEL_ORG_ID: ${VERCEL_ORG_ID}
-      VERCEL_PROJECT_ID: ${VERCEL_PROJECT_ID}
-      VERCEL_TOKEN: ${VERCEL_TOKEN}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
       GITHUB_USERNAME: ${GITHUB_USERNAME}
       GITHUB_EMAIL: ${GITHUB_EMAIL}
@@ -88,12 +90,9 @@ services:
       OPENCLAW_BETA: ${OPENCLAW_BETA:-false}
 
     volumes:
+      - openclaw-data:/data
       - openclaw-config:/root/.openclaw
       - openclaw-workspace:/root/openclaw-workspace
-
-
-      # Secure: Socket mount removed in favor of proxy
-      # - /var/run/docker.sock:/var/run/docker.sock
 
     depends_on:
       - docker-proxy
@@ -140,8 +139,8 @@ services:
 
 
 volumes:
+  openclaw-data:
   openclaw-config:
   openclaw-workspace:
   searxng-data:
-
   registry-data:
