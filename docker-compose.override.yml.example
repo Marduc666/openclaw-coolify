@@ -1,0 +1,90 @@
+# docker-compose.override.yml.example
+# 
+# This is an example override file for customizing your OpenClaw deployment.
+# To use it:
+#   1. Copy this file: cp docker-compose.override.yml.example docker-compose.override.yml
+#   2. Uncomment and modify the sections you need
+#   3. Run: docker compose up -d
+#
+# The override file is gitignored and won't be committed to version control.
+
+# Example 1: Change the OpenClaw port
+# services:
+#   openclaw:
+#     ports:
+#       - "8080:18789"  # Access on http://localhost:8080 instead
+
+# Example 2: Add extra environment variables
+# services:
+#   openclaw:
+#     environment:
+#       - DEBUG=openclaw:*
+#       - LOG_LEVEL=debug
+
+# Example 3: Mount additional volumes
+# services:
+#   openclaw:
+#     volumes:
+#       - ./my-custom-skills:/data/my-skills
+#       - ./my-config:/data/my-config
+
+# Example 4: Use a different Go version
+# services:
+#   openclaw:
+#     build:
+#       args:
+#         - GO_VERSION=1.22.0
+
+# Example 5: Override resource limits
+# services:
+#   openclaw:
+#     deploy:
+#       resources:
+#         limits:
+#           cpus: '2'
+#           memory: 4G
+#         reservations:
+#           cpus: '1'
+#           memory: 2G
+
+# Example 6: Add a custom network
+# networks:
+#   custom_network:
+#     driver: bridge
+# 
+# services:
+#   openclaw:
+#     networks:
+#       - custom_network
+#       - default
+
+# Example 7: Development mode with live reload
+# services:
+#   openclaw:
+#     volumes:
+#       - ./scripts:/app/scripts  # Live reload scripts
+#     environment:
+#       - NODE_ENV=development
+#       - OPENCLAW_DEBUG=1
+
+# Example 8: Custom healthcheck
+# services:
+#   openclaw:
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+#       interval: 15s
+#       timeout: 5s
+#       retries: 3
+
+# Example 9: Build with beta version
+# services:
+#   openclaw:
+#     build:
+#       args:
+#         - OPENCLAW_BETA=true
+
+# Example 10: Disable certain services
+# services:
+#   registry:
+#     profiles:
+#       - donotstart  # This prevents the service from starting by default

@@ -8,6 +8,23 @@ Unlike SaaS assistants where your data lives on someone else’s servers, OpenCl
 
 ---
 
+## 📚 Documentation & Quick Start
+
+**New to Docker or building images?** We've got you covered!
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Complete beginner's guide (never used Docker? Start here!)
+- **[BUILD.md](BUILD.md)** - Comprehensive build guide with troubleshooting  
+- **[Makefile](Makefile)** - Quick reference for all build commands (`make help`)
+
+**Quick Build:**
+```bash
+make build && make up
+# or
+docker compose up --build -d
+```
+
+---
+
 ## 🚀 Easy Setup on Coolify
 
 1.  Open your Coolify Dashboard.
