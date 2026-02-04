@@ -85,8 +85,8 @@ services:
 
     volumes:
       - openclaw-data:/data
-      - openclaw-config:/data/.openclaw
-      - openclaw-workspace:/data/openclaw-workspace
+      - openclaw-config:/root/.openclaw
+      - openclaw-workspace:/root/openclaw-workspace
 
     depends_on:
       - docker-proxy
@@ -116,7 +116,6 @@ services:
       EXEC: 1       # Run commands (exec)
       EVENTS: 1     # Listen for events (if needed)
 
-
   searxng:
     build:
       context: .
@@ -136,7 +135,6 @@ services:
       - CHOWN
       - SETGID
       - SETUID
-
 
 volumes:
   openclaw-data:
