@@ -1,11 +1,91 @@
+# Version control
 .git
-.DS_Store
+.gitignore
+.github
+
+# Environment files
 .env
-.env.example
+.env.local
+.env.*.local
+
+# Keep .env.example for reference in container
+!.env.example
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings
+
+# Dependencies
 node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
 dist
 build
+out
+.next
+*.o
+*.so
+*.dylib
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+
+# Testing
+coverage
+.nyc_output
+tests
+test
+__tests__
+
+# Documentation (we keep BOOTSTRAP.md and SOUL.md, exclude others)
 docs/
-brain/
-tests/
+*.draft.md
+
+# Keep these important docs in the image
+!BOOTSTRAP.md
+!SOUL.md
+!README.md
+!QUICKSTART.md
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.bak
+*.swp
+.cache
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional files
+Makefile
+docker-compose.override.yml
+
+# Keep these (override previous excludes if needed)
+!BOOTSTRAP.md
+!SOUL.md
+!README.md
+!QUICKSTART.md
+!.env.example

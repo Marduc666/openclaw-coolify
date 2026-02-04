@@ -23,7 +23,7 @@ seed_agent() {
   local dir="/data/openclaw-$id"
 
   if [ "$id" = "main" ]; then
-    dir="/fata/openclaw-workspace"
+    dir="/data/openclaw-workspace"
   fi
 
   mkdir -p "$dir"
