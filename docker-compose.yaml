@@ -8,12 +8,6 @@ services:
       REGISTRY_HTTP_SECRET: ${SERVICE_BASE64_REGISTRY}
   
   openclaw:
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:18789/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s  
     build:
       context: .
       args:
@@ -91,13 +85,19 @@ services:
 
     volumes:
       - openclaw-data:/data
-      - openclaw-config:/root/.openclaw
-      - openclaw-workspace:/root/openclaw-workspace
+      - openclaw-config:/data/.openclaw
+      - openclaw-workspace:/data/openclaw-workspace
 
     depends_on:
       - docker-proxy
 
     command: ["bash", "/app/scripts/bootstrap.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s  
 
   docker-proxy:
     image: tecnativa/docker-socket-proxy:latest
