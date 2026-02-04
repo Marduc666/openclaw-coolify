@@ -129,7 +129,7 @@ RUN pip3 install --no-cache-dir --break-system-packages \
     browser-use \
     playwright && \
     playwright install-deps && \
-    rm -rf /tmp/* /datat/.cache
+    rm -rf /tmp/* /data/.cache
 
 # =============================================================================
 # COMMAND ALIASES
