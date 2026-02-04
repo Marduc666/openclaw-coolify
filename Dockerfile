@@ -76,6 +76,12 @@ RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o go.tar.
     rm go.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
 
+# Install Cloudflare Tunnel (cloudflared)
+RUN ARCH=$(dpkg --print-architecture) && \
+    curl -L --output cloudflared.deb "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${ARCH}.deb" && \
+    dpkg -i cloudflared.deb && \
+    rm cloudflared.deb
+
 # =============================================================================
 # GITHUB CLI
 # =============================================================================
